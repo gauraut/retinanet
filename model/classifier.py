@@ -1,6 +1,7 @@
-import torch, torch.nn as nn
+import torch
+import torch.nn as nn
 import torch.nn.functional as F
-
+import math
 
 conv_relu = lambda in_c, out_c, k=3, s=1, p=1: nn.Sequential(
     nn.Conv2d(in_c, out_c, kernel_size=k, stride=s, padding=p, bias=False),
@@ -16,6 +17,15 @@ class Classifier(nn.Module):
         ))() for _ in range(4)])
 
         self.classifier_head = nn.Conv2d(in_channels, 9*num_classes, 3, stride=1, padding=1)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.normal_(m.weight, std=0.01)
+                nn.init.constant_(m.bias, 0.0)
+
+        prior = 0.01
+        bias_value = -math.log((1-prior)/prior)
+        nn.init.constant_(self.classifier_head.bias, bias_value)
         
     def forward(self, pylayers):
         out = []

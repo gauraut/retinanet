@@ -7,7 +7,7 @@ class ResNetBackbone(nn.Module):
         super().__init__()
         print("Initializing ResNet50 backbone")
         model = resnet50(weights=None if not pretrained else "DEFAULT")
-        self.out_channels = [256, 512, 1024, 2048]
+        self.out_channels = [512, 1024, 2048]
 
         self.stem = nn.Sequential(model.conv1, model.bn1, model.relu, model.maxpool) # First layer
 
@@ -24,4 +24,4 @@ class ResNetBackbone(nn.Module):
         conv4 = self.c4(conv3)
         conv5 = self.c5(conv4)
 
-        return conv2, conv3, conv4, conv5
+        return conv3, conv4, conv5
